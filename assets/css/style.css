@@ -1,5 +1,15 @@
+#game-title {
+}
+
+#gameplay-row {
+
+}
+
 .question-column {
 
+}
+
+.answer-button {
 }
 
 .answer-column {
@@ -11,5 +21,7 @@
 }
 
 .answer-item {
-    margin: 20px;
+}
+
+#timer-bar {
 }
