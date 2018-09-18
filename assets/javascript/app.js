@@ -16,7 +16,8 @@ window.onload = function() {
   $('.answer-button').on('click', activeQuestion.timerStop);
 }
 
-var timerLimit = 20;
+var timerLimit = 16;
+var scaledProgressWidth;
 var intervalId;
 var timeValue = timerLimit;
 var timerRunning = false;
@@ -56,10 +57,11 @@ var activeQuestion = {
   },
 
   eachCount: function() {
+    scaledProgressWidth = 'width: ' + convertRange(activeQuestion.timerProgressValue, [1, timerLimit]) + '%' 
     activeQuestion.time--;
     activeQuestion.timerProgressValue--;
     // Update the timer progress bar
-    $('#timer-progress').attr('style', 'width: ' + convertRange(activeQuestion.timerProgressValue, [0, timerLimit]) + '%');
+    $('#timer-progress').attr('style', scaledProgressWidth);
     // Check if time has expired
     $('#timer-digital-display').text(activeQuestion.time);
     if (timerRunning) {
