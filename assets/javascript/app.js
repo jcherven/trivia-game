@@ -86,7 +86,7 @@ var activeQuestion = {
 }
 
 /**
- * Question Bank
+ * Question Bank stolen and adapted from https://www.tutorialspoint.com/unix/unix_online_quiz.htm
  * TODO: Later on this should be an external JSON file that can be edited without messing with the app code.
  */
 
