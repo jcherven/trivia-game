@@ -87,6 +87,7 @@ var activeQuestion = {
 
 /**
  * Question Bank
+ * TODO: Later on this should be an external JSON file that can be edited without messing with the app code.
  */
 
  var qBank = {
