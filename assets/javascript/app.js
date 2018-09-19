@@ -19,7 +19,7 @@ window.onload = function() {
   })
 }
 
-var timerLimit = 16;
+const timerLimit = 16;
 var scaledProgressWidth;
 var intervalId;
 var timeValue = timerLimit;
@@ -31,15 +31,17 @@ var activeQuestionText;
 var activeQuestion = {
   time: timerLimit,
   questionNumber: this.questionNumber,
-  timerProgressValue: timerLimit - 1,
+  timerProgressValue: timerLimit,
 
   timerReset: function() {
     activeQuestion.time = timerLimit;
+    this.timerProgressValue = timerLimit;
     $('#timer-digital-display').text(this.timerLimit);
   },
 
   timerStart: function() {
     this.timerReset;
+    this.timerProgressValue = timerLimit;
     $('#question-text-display').empty();
     activeQuestionText = pickActiveQuestion(qBank);
     if (!timerRunning) {
@@ -91,9 +93,36 @@ var activeQuestion = {
     
   },
 
-  checkAnswer: function(clicked) {
-    console.log(clicked);
+  eachCount: function() {
+    scaledProgressWidth = 'width: ' + convertRange(activeQuestion.timerProgressValue, [1, timerLimit]) + '%' 
+    $('#timer-digital-display').text(activeQuestion.time);
+    // Update the timer progress bar
+    $('#timer-progress').attr('style', scaledProgressWidth);
+    activeQuestion.time--;
+    activeQuestion.timerProgressValue--;
 
+    // Check if time has expired
+    if (timerRunning) {
+      if ( activeQuestion.time <= 0) {
+        activeQuestion.timeExpired();
+      }
+    }
+    $('#timer-digital-display').text(activeQuestion.time);
+    // Update the timer progress bar
+    $('#timer-progress').attr('style', scaledProgressWidth);
+    console.log(activeQuestion.time);
+    console.log(activeQuestion.scaledProgressWidth);
+
+    /** convertRange() maps an arbitrary range to 0-100, for calculating the progress bar value. Accepts range as an array of [min, max].
+     * The generalized formula used is:
+     * ( value - r1[ 0 ] ) * ( r2[ 1 ] - r2[ 0 ] ) / ( r1[ 1 ] - r1[ 0 ] ) + r2[ 0 ];
+     */
+    function convertRange(value, range) {
+      return (value - range[0]) * (100) / (range[1] - range[0]);
+    }
+  },
+
+  checkAnswer: function(clicked) {
     activeQuestion.timerStop();
     $('.answer-button').toggleClass('disabled');
     if ( clicked == activeQuestionText.correct) {
@@ -106,45 +135,26 @@ var activeQuestion = {
     return;
   },
 
+  timeExpired: function() {
+    if ( activeQuestion.time <=0)
+      activeQuestion.timerStop();
+    activeQuestion.displayWrongText();
+      setTimeout(activeQuestion.timerStart, 3000);
+    return;
+  },
+
   timerStop: function() {
     clearInterval(intervalId);
     timerRunning = false;
     $('.answer-button').toggleClass('disabled');
   },
 
-  eachCount: function() {
-    scaledProgressWidth = 'width: ' + convertRange(activeQuestion.timerProgressValue, [1, timerLimit]) + '%' 
-    activeQuestion.time--;
-    activeQuestion.timerProgressValue--;
-    // Update the timer progress bar
-    $('#timer-progress').attr('style', scaledProgressWidth);
-    // Check if time has expired
-    $('#timer-digital-display').text(activeQuestion.time);
-    if (timerRunning) {
-      if ( activeQuestion.time <= 0) {
-        activeQuestion.timeExpired();
-      }
-    }
 
-    /** convertRange() maps an arbitrary range to 0-100, for calculating the progress bar value. Accepts range as an array of [min, max].
-     * The generalized formula used is:
-     * ( value - r1[ 0 ] ) * ( r2[ 1 ] - r2[ 0 ] ) / ( r1[ 1 ] - r1[ 0 ] ) + r2[ 0 ];
-     */
-    function convertRange(value, range) {
-      return (value - range[0]) * (100) / (range[1] - range[0]);
-    }
-  },
 
   displayQuestionNum: function() {
     $('#question-number-display').text(activeQuestion.questionNumber);
   },
   
-  timeExpired: function() {
-    activeQuestion.timerStop();
-    activeQuestion.displayWrongText();
-    return;
-  },
-
   displayWrongText: function() {
     $('.answer-button').toggleClass('disabled');
     $('#question-text-display').append('<div class="d-block">' + activeQuestionText.wrongText + '</div>');
