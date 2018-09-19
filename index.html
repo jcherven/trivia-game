@@ -33,10 +33,12 @@
         </div> <!--End jumbotron-->
 
         <div class="d-md-flex flex-row" id="gameplay-row">
-            <div class="col-md-7 d-flex question-column">
-                <div class="p-2" id="question-number-display">0</div>
-                <div class="p-2" id="question-text-display">
-                    <button type="button" class="btn btn-dark" id="start-button">Click to start desu</button>
+            <div class="col-md-7 d-flex align-items-center question-column">
+                <div class="col-md-1" id="question-number-display">0</div>
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="d-flex align-items-center justify-content-center" id="question-text-display">
+                        <button type="button" class="btn btn-dark" id="start-button">Click to start desu</button>
+                    </div>
                 </div>
             </div> <!--End question-column-->
 
@@ -44,29 +46,29 @@
 
                 <div class="d-flex flex-row">
                     <button type="button" class="btn btn-outline-dark btn-block text-left answer-button" id="a-button" value="a">
-                        <span class="mr-3 answer-label">A</span>
-                        <span id="a-answer-content">a-answer-content</span>
+                        <span class="mr-3 answer-label"></span>
+                        <span id="a-answer-content"></span>
                     </button>
                 </div>
                 
                 <div class="d-flex flex-row">
                     <button type="button" class="btn btn-outline-dark btn-block text-left answer-button" id="b-button" value="b">
-                        <span class="mr-3 answer-label">B</span>
-                        <span id="b-answer-content">b-answer-content</span>
+                        <span class="mr-3 answer-label"></span>
+                        <span id="b-answer-content"></span>
                     </button>
                 </div>
 
                 <div class="d-flex flex-row">
                         <button type="button" class="btn btn-outline-dark btn-block text-left answer-button" id="c-button" value="c">
-                            <span class="mr-3 answer-label">C</span>
-                            <span id="c-answer-content">c-answer-content</span>
+                            <span class="mr-3 answer-label"></span>
+                            <span id="c-answer-content"></span>
                         </button>
                     </div>
                     
                     <div class="d-flex flex-row">
                         <button type="button" class="btn btn-outline-dark btn-block text-left answer-button" id="d-button" value="d">
-                                <span class="mr-3 answer-label">D</span>
-                                <span id="d-answer-content">d-answer-content</span>
+                                <span class="mr-3 answer-label"></span>
+                                <span id="d-answer-content"></span>
                         </button>
                     </div>
 
@@ -74,14 +76,15 @@
 
         </div> <!--End gameplay-row-->
 
-        <div class="row align-items-center question-timer">
-            <div class="col-md-1">
-                <h1 class="display3" id="timer-digital-display">00</h1>
+        <div class="d-flex d-row mt-4 align-items-center justify-content-center question-timer">
+            <div class="d-flex flex-column justify-content-center">
+                <div id="timer-display-label">TIMER</div>
+                <div id="timer-digital-display">00</div>
             </div>
             
             <div class="col-md-11">
                 <div class="progress" style="height: 50px">
-                    <div class="progress-bar bg-danger " id="timer-progress" role="progressbar" style="width: 100%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="20"></div>
+                    <div class="progress-bar bg-danger " id="timer-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
         </div> <!-- End question-timer -->
