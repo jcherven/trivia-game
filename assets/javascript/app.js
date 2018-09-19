@@ -40,11 +40,12 @@ var activeQuestion = {
 
   timerStart: function() {
     this.timerReset;
+    $('#question-text-display').empty();
     activeQuestionText = pickActiveQuestion(qBank);
     if (!timerRunning) {
       $('.answer-button').toggleClass('disabled');
       activeQuestion.questionNumber++;
-      $('#start-button').replaceWith('<div class="p-2">' + activeQuestionText.qText + '</div>');
+      $('#question-text-display').text(activeQuestionText.qText);
       $('#a-answer-content').html(activeQuestionText.aText);
       $('#b-answer-content').html(activeQuestionText.bText);
       $('#c-answer-content').html(activeQuestionText.cText);
@@ -90,18 +91,26 @@ var activeQuestion = {
     
   },
 
-    checkAnswer: function(clicked) {
-      console.log(clicked);
+  checkAnswer: function(clicked) {
+    console.log(clicked);
 
-      return;
-    },
+    activeQuestion.timerStop();
+    $('.answer-button').toggleClass('disabled');
+    if ( clicked == activeQuestionText.correct) {
+      activeQuestion.displayRightText();
+    }
+    else if ( clicked != activeQuestionText.correct) {
+      activeQuestion.displayWrongText();
+    }
+    setTimeout(activeQuestion.timerStart, 3000);
+    return;
+  },
 
   timerStop: function() {
     clearInterval(intervalId);
     timerRunning = false;
-    
+    $('.answer-button').toggleClass('disabled');
   },
-
 
   eachCount: function() {
     scaledProgressWidth = 'width: ' + convertRange(activeQuestion.timerProgressValue, [1, timerLimit]) + '%' 
@@ -113,9 +122,7 @@ var activeQuestion = {
     $('#timer-digital-display').text(activeQuestion.time);
     if (timerRunning) {
       if ( activeQuestion.time <= 0) {
-        activeQuestion.timerStop();
-        $('.answer-button').toggleClass('disabled');
-        this.timerStart;
+        activeQuestion.timeExpired();
       }
     }
 
@@ -130,6 +137,23 @@ var activeQuestion = {
 
   displayQuestionNum: function() {
     $('#question-number-display').text(activeQuestion.questionNumber);
+  },
+  
+  timeExpired: function() {
+    activeQuestion.timerStop();
+    activeQuestion.displayWrongText();
+    return;
+  },
+
+  displayWrongText: function() {
+    $('.answer-button').toggleClass('disabled');
+    $('#question-text-display').append('<div class="d-block">' + activeQuestionText.wrongText + '</div>');
+    return;
+  },
+  displayRightText: function() {
+    $('.answer-button').toggleClass('disabled');
+    $('#question-text-display').append('<div class="d-block">' + activeQuestionText.rightText + '</div>'); 
+    return;
   }
 }
 
