@@ -16,7 +16,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Trivia Game Demo</title>
+    <title>Unix Trivia Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="assets/css/style.css" />
     
@@ -26,49 +26,84 @@
 </head>
 <body>
     <div class="container">
-        <div class="jumbotron">
-            <div class="d-flex justify-content-center align-items-center">
-                <h1 class="display-3" id="game-title">Trivia Game Demo</h1>
+        
+        <div id="jumbotron"
+            class="jumbotron">
+
+            <div id="game-title"
+                class="d-flex justify-content-center align-items-center">
+                <h1 class="display-4" >
+                    Unix Trivia Demo
+                </h1>
             </div>
+
         </div> <!--End jumbotron-->
 
-        <div class="d-md-flex flex-row" id="gameplay-row">
-            <div class="col-md-7 d-flex align-items-center question-column">
-                <div class="col-md-1" id="question-number-display">0</div>
-                <div class="d-flex align-items-center justify-content-center">
-                    <div class="d-flex align-items-center justify-content-center" id="question-text-display">
-                        <button type="button" class="btn btn-dark" id="start-button">Click to start desu</button>
-                    </div>
+        <div id="gameplay-row"
+            class="d-md-flex flex-row no-colpad-right" >
+
+            <div class="question-column col-md-7 d-flex  ">
+
+                <div id="question-number-display" 
+                    class="col-md-1 align-items-stretch " >
+                    0
                 </div>
+
+                <div id="question-display-container"
+                    class="d-flex flex-grow-1 align-items-center justify-content-center">
+
+                    <div id="question-text-display" 
+                        class="d-flex flex-grow-1 align-items-center justify-content-center ">
+                        <button id="start-button" 
+                            type="button" 
+                            class="btn btn-block btn-dark" >
+                            Click to start desu
+                        </button>
+                    </div>
+
+                </div>
+
             </div> <!--End question-column-->
 
-            <div class="col-md-5 answer-column">
+            <div class="answer-column col-md-5">
 
-                <div class="d-flex flex-row">
-                    <button type="button" class="btn btn-outline-dark btn-block text-left answer-button" id="a-button" value="a">
+                <div class="answer-button d-flex flex-row">
+                    <button id="a-button"
+                        type="button"
+                        class="answer-button btn btn-outline-dark btn-block text-left "
+                        value="a">
                         <span class="mr-3 answer-label"></span>
                         <span id="a-answer-content"></span>
                     </button>
                 </div>
                 
-                <div class="d-flex flex-row">
-                    <button type="button" class="btn btn-outline-dark btn-block text-left answer-button" id="b-button" value="b">
+                <div class="answer-button d-flex flex-row">
+                    <button id="b-button"
+                        type="button"
+                        class="answer-button btn btn-outline-dark btn-block text-left "
+                        value="b">
                         <span class="mr-3 answer-label"></span>
                         <span id="b-answer-content"></span>
                     </button>
                 </div>
 
-                <div class="d-flex flex-row">
-                        <button type="button" class="btn btn-outline-dark btn-block text-left answer-button" id="c-button" value="c">
-                            <span class="mr-3 answer-label"></span>
-                            <span id="c-answer-content"></span>
+                <div class="answer-button d-flex flex-row">
+                        <button id="c-button"
+                        type="button"
+                        class="answer-button btn btn-outline-dark btn-block text-left "
+                        value="c">
+                        <span class="mr-3 answer-label"></span>
+                        <span id="c-answer-content"></span>
                         </button>
                     </div>
                     
-                    <div class="d-flex flex-row">
-                        <button type="button" class="btn btn-outline-dark btn-block text-left answer-button" id="d-button" value="d">
-                                <span class="mr-3 answer-label"></span>
-                                <span id="d-answer-content"></span>
+                    <div class="answer-button d-flex flex-row">
+                        <button id="d-button"
+                        type="button"
+                        class="answer-button btn btn-outline-dark btn-block text-left "
+                        value="d">
+                        <span class="mr-3 answer-label"></span>
+                        <span id="d-answer-content"></span>
                         </button>
                     </div>
 
@@ -76,17 +111,24 @@
 
         </div> <!--End gameplay-row-->
 
-        <div class="d-flex d-row mt-4 align-items-center justify-content-center question-timer">
-            <div class="d-flex flex-column justify-content-center">
+        <div id="question-timer-row"
+            class="d-flex d-row mt-4 align-items-center justify-content-center no-colpad-right">
+            <div id="timer-container"
+                class="d-flex flex-column justify-content-center">
                 <div id="timer-display-label">TIMER</div>
-                <div id="timer-digital-display">00</div>
+                <h5 id="timer-digital-display">00</h5>
             </div>
             
-            <div class="col-md-11">
-                <div class="progress" style="height: 50px">
-                    <div class="progress-bar bg-danger " id="timer-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress col-md-11"
+                    style="height: 50px">
+                    <div id="timer-progress"
+                        class="progress-bar bg-danger "
+                        role="progressbar"
+                        style="width: 100%"
+                        aria-valuenow="0"
+                        aria-valuemin="0"
+                        aria-valuemax="100"></div>
                 </div>
-            </div>
         </div> <!-- End question-timer -->
     </div> <!--End container-->
 

@@ -1,27 +1,10 @@
-#game-title {
+#wf {
+    border: 1px solid grey;
 }
 
-#gameplay-row {
-
+/** Override col padding in answer row **/
+.no-colpad-right > [class*='col-'] {
+    padding-right: 0;
+    padding-left: 0;
 }
 
-.question-column {
-
-}
-
-.answer-button {
-}
-
-.answer-column {
-
-}
-
-.answer-label {
-
-}
-
-.answer-item {
-}
-
-#timer-bar {
-}

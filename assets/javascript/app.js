@@ -11,168 +11,78 @@
 *                 \____/\__,_/_/ /_/ /_/\___/ 
 **/
 
-window.onload = function() {
-  $('.answer-button').toggleClass('disabled');
-  $('#start-button').click(activeQuestion.timerStart);
-  $('.answer-button').click( function() {
-    activeQuestion.checkAnswer($(this).attr('value'));
-  })
-}
-
 const timerLimit = 16;
-var scaledProgressWidth;
+var progressValue = 100;
+var scaledProgressWidth = progressValue;
 var intervalId;
 var timeValue = timerLimit;
 var timerRunning = false;
 var questionNumber = 0;
-var activeQuestionText;
+var activeQuestion;
 
-// Question-Answer Handling Object
-var activeQuestion = {
-  time: timerLimit,
-  questionNumber: this.questionNumber,
-  timerProgressValue: timerLimit,
+// jQuery DOM objects
+var $qDisplay = $('#question-text-display');
+var $aButton = $('#a-button');
+var $bButton = $('#b-button');
+var $cButton = $('#c-button');
+var $dButton = $('#d-button');
 
-  timerReset: function() {
-    activeQuestion.time = timerLimit;
-    this.timerProgressValue = timerLimit;
-    $('#timer-digital-display').text(this.timerLimit);
-  },
-
-  timerStart: function() {
-    this.timerReset;
-    this.timerProgressValue = timerLimit;
-    $('#question-text-display').empty();
-    activeQuestionText = pickActiveQuestion(qBank);
-    if (!timerRunning) {
-      $('.answer-button').toggleClass('disabled');
-      activeQuestion.questionNumber++;
-      $('#question-text-display').text(activeQuestionText.qText);
-      $('#a-answer-content').html(activeQuestionText.aText);
-      $('#b-answer-content').html(activeQuestionText.bText);
-      $('#c-answer-content').html(activeQuestionText.cText);
-      $('#d-answer-content').html(activeQuestionText.dText);
-      activeQuestion.displayQuestionNum();
-
-      intervalId = setInterval(activeQuestion.eachCount, 1000);
-      timerRunning = true;
-    }
-
-    function pickActiveQuestion(qObject) {
-      // Construct a new object for display
-      function Question(qText, aText, bText, cText, dText, correct, rightText, wrongText) {
-        this.qText = qText;
-        this.aText = aText;
-        this.bText = bText;
-        this.cText = cText;
-        this.dText = dText;
-        this.correct = correct;
-        this.rightText = rightText;
-        this.wrongText = wrongText;
-      };
-
-      var result;
-      var count = 0;
-      for ( var property in qObject )
-        if (Math.random() < 1 / ++count)
-          result = property;
-      console.log(result);
-      var pickedQuestion = new Question(
-        qObject[result].question,
-        qObject[result].aAnswer,
-        qObject[result].bAnswer,
-        qObject[result].cAnswer, 
-        qObject[result].dAnswer,
-        qObject[result].correct,
-        qObject[result].correctText,
-        qObject[result].incorrectText
-      );
-
-      return pickedQuestion;
-    }
-    
-  },
-
-  eachCount: function() {
-    scaledProgressWidth = 'width: ' + convertRange(activeQuestion.timerProgressValue, [1, timerLimit]) + '%' 
-    $('#timer-digital-display').text(activeQuestion.time);
-    // Update the timer progress bar
-    $('#timer-progress').attr('style', scaledProgressWidth);
-    activeQuestion.time--;
-    activeQuestion.timerProgressValue--;
-
-    // Check if time has expired
-    if (timerRunning) {
-      if ( activeQuestion.time <= 0) {
-        activeQuestion.timeExpired();
-      }
-    }
-    $('#timer-digital-display').text(activeQuestion.time);
-    // Update the timer progress bar
-    $('#timer-progress').attr('style', scaledProgressWidth);
-    console.log(activeQuestion.time);
-    console.log(activeQuestion.scaledProgressWidth);
-
-    /** convertRange() maps an arbitrary range to 0-100, for calculating the progress bar value. Accepts range as an array of [min, max].
-     * The generalized formula used is:
-     * ( value - r1[ 0 ] ) * ( r2[ 1 ] - r2[ 0 ] ) / ( r1[ 1 ] - r1[ 0 ] ) + r2[ 0 ];
-     */
-    function convertRange(value, range) {
-      return (value - range[0]) * (100) / (range[1] - range[0]);
-    }
-  },
-
-  checkAnswer: function(clicked) {
-    activeQuestion.timerStop();
-    $('.answer-button').toggleClass('disabled');
-    if ( clicked == activeQuestionText.correct) {
-      activeQuestion.displayRightText();
-    }
-    else if ( clicked != activeQuestionText.correct) {
-      activeQuestion.displayWrongText();
-    }
-    setTimeout(activeQuestion.timerStart, 3000);
+window.onload = function() {
+  // Toggle .answer-button attribute 'disabled' ON
+  $('.answer-button').toggleClass('disabled');
+  $('#start-button').click( function() {
+    activeQuestion = pickActiveQuestion(unixQuestionBank);
+    displayQuestionText(activeQuestion);
+  });
+  $('.answer-button').click( function() {
+    console.log('Hi from inside a click event on .answer-button');
     return;
-  },
+  })
+}
 
-  timeExpired: function() {
-    if ( activeQuestion.time <=0)
-      activeQuestion.timerStop();
-    activeQuestion.displayWrongText();
-      setTimeout(activeQuestion.timerStart, 3000);
-    return;
-  },
+function pickActiveQuestion(qObj) {
+  console.log("Hi from inside pickActiveQuestion()");
+  // pick a random property from qObject
+  var qObjectKeys = Object.keys(qObj);
+  var q = qObjectKeys[Math.floor(Math.random() * qObjectKeys.length)];
+  var selected = new PickedQuestion(qObj[q].question, qObj[q].aAnswer, qObj[q].bAnswer, qObj[q].cAnswer, qObj[q].dAnswer, qObj[q].correct, qObj[q].correctText, qObj[q].incorrectText);
 
-  timerStop: function() {
-    clearInterval(intervalId);
-    timerRunning = false;
-    $('.answer-button').toggleClass('disabled');
-  },
+  return selected;
 
-
-
-  displayQuestionNum: function() {
-    $('#question-number-display').text(activeQuestion.questionNumber);
-  },
-  
-  displayWrongText: function() {
-    $('.answer-button').toggleClass('disabled');
-    $('#question-text-display').append('<div class="d-block">' + activeQuestionText.wrongText + '</div>');
-    return;
-  },
-  displayRightText: function() {
-    $('.answer-button').toggleClass('disabled');
-    $('#question-text-display').append('<div class="d-block">' + activeQuestionText.rightText + '</div>'); 
-    return;
+  // construct a question object to return
+  function PickedQuestion(question, aAnswer, bAnswer, cAnswer, dAnswer, correct, correctText, incorrectText) {
+    this.question = question;
+    this.aAnswer = aAnswer;
+    this.bAnswer = bAnswer;
+    this.cAnswer = cAnswer;
+    this.dAnswer = dAnswer;
+    this.correct = correct;
+    this.correctText = correctText;
+    this.incorrectText = incorrectText;
   }
 }
+
+function displayQuestionText(qObject) {
+    // Toggle .answer-button attribute 'disabled' OFF
+    $('.answer-button').toggleClass('disabled');
+  var qCardMarkup = '<div class="card p-2"><h4 class="card-title">' + qObject.question  + '</h4></div>';
+  $qDisplay.empty();
+  $qDisplay.html(qCardMarkup);
+  $aButton.html(qObject.aAnswer);
+  $bButton.html(qObject.bAnswer);
+  $cButton.html(qObject.cAnswer);
+  $dButton.html(qObject.dAnswer);
+
+  return;
+}
+
+
 
 /**
  * Question Bank stolen and adapted from https://www.tutorialspoint.com/unix/unix_online_quiz.htm
  * TODO: Later on this should be an external JSON file that can be edited without messing with the app code.
  */
-
-var qBank = {
+var unixQuestionBank = {
   q0: {
     question: 'Choose the odd one out:',
     aAnswer: 'csh',
@@ -180,8 +90,8 @@ var qBank = {
     cAnswer: 'ksh',
     dAnswer: 'Kernel',
     correct: 'd',
-    correctText: 'Yeah! Csh, bsh, and ksh are all shell environments. Kernel refers to the operating system component.',
-    incorrectText: 'Nope. Think about what `sh` typically means in Unix land.'
+    correctText: 'Csh, bsh, and ksh are all shell environments. Kernel refers to the operating system component.',
+    incorrectText: 'Think about what `sh` typically means in Unix land.'
   },
 
   q1: {
@@ -191,8 +101,8 @@ var qBank = {
     cAnswer: '!#',
     dAnswer: 'None of the above',
     correct: 'b',
-    correctText: 'Right! Learning all of the silly nicknames for punctuation characters really helps remember how to write the shebang.',
-    incorrectText: 'Wrong! Remember that the exclamation point is also informally called "bang" for short.'
+    correctText: 'Learning all of the silly nicknames for punctuation characters really helps remember how to write the shebang.',
+    incorrectText: 'Remember that the exclamation point is also informally called "bang" for short.'
   },
 
   q2: {
@@ -202,8 +112,8 @@ var qBank = {
     cAnswer: '`tee`',
     dAnswer: '`vi`',
     correct: 'b',
-    correctText: 'That\'s right, creating empty files at the command line isn\'t the only thing `touch` does.',
-    incorrectText: 'That\'s not it. The answer is a command you probably use a lot for a different purpose. But if you think about it, it makes a lot of sense!'
+    correctText: 'Creating empty files at the command line isn\'t the only thing `touch` does.',
+    incorrectText: 'The answer is a command you probably use a lot for a different purpose. But if you think about it, it makes a lot of sense!'
   },
 
   q3: {
@@ -213,8 +123,8 @@ var qBank = {
     cAnswer: '`-c`',
     dAnswer: '`-p`',
     correct: 'b',
-    correctText: 'Yeah! the "i" is short for `--interactive`, which makes the user confirm before committing the command.',
-    incorrectText: 'Nope. Think about what a prompt forces the user to do... or, even better, check the man pages!'
+    correctText: 'The "i" is short for `--interactive`, which makes the user confirm before committing the command.',
+    incorrectText: 'Think about what a prompt forces the user to do... or, even better, check the man pages!'
   },
 
   q4: {
@@ -224,8 +134,8 @@ var qBank = {
     cAnswer: '`du`',
     dAnswer: '`df`',
     correct: 'c',
-    correctText: 'Right! Unix commands almost describe themselves once you\'re familiar with some of the conventions used in their names.',
-    incorrectText: 'Nope. This particular command is very self-descriptive.'
+    correctText: 'Unix commands almost describe themselves once you\'re familiar with some of the conventions used in their names.',
+    incorrectText: 'This particular command is very self-descriptive.'
   },
 
   q5: {
@@ -235,19 +145,19 @@ var qBank = {
     cAnswer: '`$}`',
     dAnswer: '`}$`',
     correct: 'd',
-    correctText: 'Correct. The `$` regular expression is an end-of-line anchor.',
-    incorrectText: 'Incorrect. Check out how "anchors" are used in regular expressions.'
+    correctText: 'The `$` regular expression is an end-of-line anchor.',
+    incorrectText: 'Check out how "anchors" are used in regular expressions.'
   },
 
   q6: {
     question: 'The `sed` command is most useful for:',
     aAnswer: 'Evaluating complex boolean expressions',
-    bAnswer: 'Actually, it`s an active process viewer',
+    bAnswer: 'Viewing text files',
     cAnswer: 'Mounting external devices',
     dAnswer: 'Editing text based on predefined rules',
     correct: 'd',
-    correctText: 'Right! Sed is short for "stream editor". It\'s great for programming how you want to edit some text if you already know the contents of it.',
-    incorrectText: 'Nope. If it helps, sed is short for "stream editor".'
+    correctText: 'Sed is short for "stream editor". It\'s great for programming how you want to edit some text if you already know the contents of it.',
+    incorrectText: 'If it helps, sed is short for "stream editor".'
   },
 
   q7: {
@@ -257,8 +167,8 @@ var qBank = {
     cAnswer: '`grp`',
     dAnswer: '`chowner`',
     correct: 'a',
-    correctText: 'Right. This one can get confusing unless you pay attention to how other user modifying utilities are named.',
-    incorrectText: 'Nope. Think about how other user modifying tools are named, and see if there\'s a scheme to it.'
+    correctText: 'This one can get confusing unless you pay attention to how other user modifying utilities are named.',
+    incorrectText: 'Think about how other user modifying tools are named, and see if there\'s a scheme to it.'
   },
 
   q8: {
@@ -268,8 +178,8 @@ var qBank = {
     cAnswer: '`Group`',
     dAnswer: 'All of the above',
     correct: 'd',
-    correctText: 'Right. The superuser has all of the privileges of root, which completely owns the machine.',
-    incorrectText: 'Incorrect. Doesn\'t the superuser have all privileges of root?'
+    correctText: 'The superuser has all of the privileges of root, which completely owns the machine.',
+    incorrectText: 'Doesn\'t the superuser have all privileges of root?'
   },
 
   q9: {
@@ -279,8 +189,16 @@ var qBank = {
     cAnswer: '0',
     dAnswer: '8',
     correct: 'c',
-    correctText: 'Yes. `init` is the parent of all processes, and is the first one there at system startup.',
-    incorrectText: 'That\'s not the best guess... PIDs are numbers given sequentially, and `init` is the originating process from which all other processes are forked.' 
+    correctText: '`init` is the parent of all processes, and is the first one there at system startup.',
+    incorrectText: 'PIDs are numbers given sequentially, and `init` is the originating process from which all other processes are forked.' 
   }
 
- }
+}
+
+    /** convertRange() maps an arbitrary range to 0-100, for calculating the progress bar value. Accepts range as an array of [min, max].
+     * The generalized formula used is:
+     * ( value - r1[ 0 ] ) * ( r2[ 1 ] - r2[ 0 ] ) / ( r1[ 1 ] - r1[ 0 ] ) + r2[ 0 ];
+     */
+    function convertRange(value, range) {
+      return (value - range[0]) * (100) / (range[1] - range[0]);
+    }
