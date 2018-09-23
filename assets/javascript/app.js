@@ -11,47 +11,79 @@
 *                 \____/\__,_/_/ /_/ /_/\___/ 
 **/
 
-const timerLimit = 16;
+const timerLimit = 8;
+
 var progressValue = 100;
 var scaledProgressWidth = progressValue;
-var intervalId;
+var timeInterval;
 var timeValue = timerLimit;
 var timerRunning = false;
-var questionNumber = 0;
+var playerQuestionNumber = 0;
 var activeQuestion;
+var gameState = 0;
+var qList = [];
 
 // jQuery DOM objects
 var $qDisplay = $('#question-text-display');
+var $qNumDisplay = $('#question-number-display');
 var $aButton = $('#a-button');
 var $bButton = $('#b-button');
 var $cButton = $('#c-button');
 var $dButton = $('#d-button');
+var $answerButtons = $('.answer-button');
 
-window.onload = function() {
-  // Toggle .answer-button attribute 'disabled' ON
+$(document).ready( function() {
+  // Toggle .answer-button attribute 'disabled' OFF
   $('.answer-button').toggleClass('disabled');
   $('#start-button').click( function() {
-    activeQuestion = pickActiveQuestion(unixQuestionBank);
-    displayQuestionText(activeQuestion);
+    initNewQuestion(gameState); // toggles 'disabled' ON
   });
   $('.answer-button').click( function() {
-    console.log('Hi from inside a click event on .answer-button');
-    return;
+    // Toggle .answer-button attribute 'disabled' OFF
+    $('.answer-button').toggleClass('disabled');
+    checkPlayerAnswer($(this).attr('value'));
+    // hack around this function bubbling back to run twice for some reason
+    return false;
   })
+})
+
+function initNewQuestion(state) {
+  activeQuestion = pickActiveQuestion(unixQuestionBank);
+  displayQuestionText(activeQuestion);
+  switch ( state ) {
+    case 0: // First question of a new set 
+      playerQuestionNumber++;
+      $qNumDisplay.html(playerQuestionNumber);
+      break;
+    case 1: // Answer was correct
+
+      break;
+    case 2: // Answer was incorrect
+
+      break;
+  }
 }
 
 function pickActiveQuestion(qObj) {
-  console.log("Hi from inside pickActiveQuestion()");
-  // pick a random property from qObject
+  // list of available questions
   var qObjectKeys = Object.keys(qObj);
-  var q = qObjectKeys[Math.floor(Math.random() * qObjectKeys.length)];
-  var selected = new PickedQuestion(qObj[q].question, qObj[q].aAnswer, qObj[q].bAnswer, qObj[q].cAnswer, qObj[q].dAnswer, qObj[q].correct, qObj[q].correctText, qObj[q].incorrectText);
-
+  // Variable for the selected property
+  var q = 'q';
+  // Check if a question has already been asked to the player
+  // or if all questions have been asked
+  while ( qList.includes(q) === false ) {
+    // Pseudorandomly pick a question
+    q = qObjectKeys[Math.floor(Math.random() * qObjectKeys.length)];
+    var selected = new PickedQuestion(qObj[q].question, qObj[q].question.number, qObj[q].aAnswer, qObj[q].bAnswer, qObj[q].cAnswer, qObj[q].dAnswer, qObj[q].correct, qObj[q].correctText, qObj[q].incorrectText);
+    // blacklist the picked question to break the loop
+    qList.push(q);
+  }
   return selected;
 
   // construct a question object to return
-  function PickedQuestion(question, aAnswer, bAnswer, cAnswer, dAnswer, correct, correctText, incorrectText) {
+  function PickedQuestion(question, qNumber, aAnswer, bAnswer, cAnswer, dAnswer, correct, correctText, incorrectText) {
     this.question = question;
+    this.qNumber = qNumber;
     this.aAnswer = aAnswer;
     this.bAnswer = bAnswer;
     this.cAnswer = cAnswer;
@@ -63,20 +95,39 @@ function pickActiveQuestion(qObj) {
 }
 
 function displayQuestionText(qObject) {
-    // Toggle .answer-button attribute 'disabled' OFF
+    // Toggle .answer-button attribute 'disabled' ON
     $('.answer-button').toggleClass('disabled');
-  var qCardMarkup = '<div class="card p-2"><h4 class="card-title">' + qObject.question  + '</h4></div>';
+  var qCardMarkup = '<div class="card p-2"><h4 class="card-title">' + qObject.question.text  + '</h4></div>';
   $qDisplay.empty();
   $qDisplay.html(qCardMarkup);
   $aButton.html(qObject.aAnswer);
   $bButton.html(qObject.bAnswer);
   $cButton.html(qObject.cAnswer);
   $dButton.html(qObject.dAnswer);
-
-  return;
+  console.log('Correct answer for this question: ' + qObject.correct);
 }
 
+function checkPlayerAnswer(clickedValue) {
+  console.log(clickedValue);
 
+  if ( clickedValue === activeQuestion.correct ) {
+    console.log('yup');
+      $qDisplay.empty();
+      $qDisplay.html(activeQuestion.correctText);
+      setTimeout(function() {initNewQuestion(1)}, 3000);
+      playerQuestionNumber++;
+      $qNumDisplay.html(playerQuestionNumber);
+  }
+  else if ( clickedValue != activeQuestion.correct ) {
+    console.log('nope');
+      $qDisplay.empty();
+      $qDisplay.html(activeQuestion.incorrectText);
+      setTimeout(function() {initNewQuestion(2)}, 3000);
+      playerQuestionNumber++;
+      $qNumDisplay.html(playerQuestionNumber);
+  }
+
+}
 
 /**
  * Question Bank stolen and adapted from https://www.tutorialspoint.com/unix/unix_online_quiz.htm
@@ -84,7 +135,10 @@ function displayQuestionText(qObject) {
  */
 var unixQuestionBank = {
   q0: {
-    question: 'Choose the odd one out:',
+    question: {
+      text: 'Choose the odd one out:',
+      number: 0
+    },
     aAnswer: 'csh',
     bAnswer: 'bsh',
     cAnswer: 'ksh',
@@ -95,7 +149,10 @@ var unixQuestionBank = {
   },
 
   q1: {
-    question: 'The "shebang" line in a shell script begins with:',
+    question: {
+      text: 'The "shebang" line in a shell script begins with:',
+      number: 1
+    },
     aAnswer: '#',
     bAnswer: '#!',
     cAnswer: '!#',
@@ -106,7 +163,10 @@ var unixQuestionBank = {
   },
 
   q2: {
-    question: 'This command is used to update access and modification times of a file:',
+    question: {
+      text: 'This command is used to update access and modification times of a file:',
+      number: 2
+    },
     aAnswer: '`finger`',
     bAnswer: '`touch`',
     cAnswer: '`tee`',
@@ -117,7 +177,10 @@ var unixQuestionBank = {
   },
 
   q3: {
-    question: 'Which option flag is used with `rm` command to prompt the user before file deletion?',
+    question: {
+      text: 'Which option flag is used with `rm` command to prompt the user before file deletion?',
+      number: 3
+    },
     aAnswer: '`-ask`',
     bAnswer: '`-i`',
     cAnswer: '`-c`',
@@ -128,7 +191,10 @@ var unixQuestionBank = {
   },
 
   q4: {
-    question: 'Which command gives a disk usage summary?',
+    question: {
+      text: 'Which command gives a disk usage summary?',
+      number: 4
+    },
     aAnswer: '`chkdsk`',
     bAnswer: '`fdisk`',
     cAnswer: '`du`',
@@ -139,7 +205,10 @@ var unixQuestionBank = {
   },
 
   q5: {
-    question: 'Choose the correct `grep` pattern to search for lines ending with a closing curly brace:',
+    question: {
+      text: 'Choose the correct `grep` pattern to search for lines ending with a closing curly brace:',
+      number: 5
+    },
     aAnswer: '`^}`',
     bAnswer: '`}^`',
     cAnswer: '`$}`',
@@ -150,7 +219,10 @@ var unixQuestionBank = {
   },
 
   q6: {
-    question: 'The `sed` command is most useful for:',
+    question: {
+      text: 'The `sed` command is most useful for:',
+      number: 6
+    },
     aAnswer: 'Evaluating complex boolean expressions',
     bAnswer: 'Viewing text files',
     cAnswer: 'Mounting external devices',
@@ -161,7 +233,10 @@ var unixQuestionBank = {
   },
 
   q7: {
-    question: 'Which command changes the group owner of a file:',
+    question: {
+      text: 'Which command changes the group owner of a file:',
+      number: 7
+    },
     aAnswer: '`chgrp`',
     bAnswer: '`cgrp`',
     cAnswer: '`grp`',
@@ -172,7 +247,10 @@ var unixQuestionBank = {
   },
 
   q8: {
-    question: 'The superuser can only change this permission of a file:',
+    question: {
+      text: 'The superuser can only change this permission of a file:',
+      number: 8
+    },
     aAnswer: '`Others`',
     bAnswer: '`Owner`',
     cAnswer: '`Group`',
@@ -183,7 +261,10 @@ var unixQuestionBank = {
   },
 
   q9: {
-    question: 'What is the PID of the process `init`?',
+    question: {
+      text: 'What is the PID of the process `init`?',
+      number: 9
+    },
     aAnswer: 'S',
     bAnswer: '1',
     cAnswer: '0',
